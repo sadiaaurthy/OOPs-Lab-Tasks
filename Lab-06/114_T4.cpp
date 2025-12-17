@@ -21,7 +21,6 @@ public:
         blue = clamp(b);
         alpha = clamp(a);
     }
-
     ~PixelAlpha() {}
     int getRed() const { return red; }
     int getGreen() const { return green; }
@@ -83,4 +82,5 @@ int main() {
     cout << "PixelAlpha(300, 400, -50, 500): " << p7 << endl;
     
     return 0;
+
 }
