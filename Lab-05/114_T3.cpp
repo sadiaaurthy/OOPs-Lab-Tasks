@@ -1,120 +1,105 @@
 #include <iostream>
-#include <cmath>
 #include <string>
+#include <cmath>
 using namespace std;
-
-class StockPortfolio {
+class StockPortFolio {
 private:
     string ownerName;
     double totalValue;
     int riskVolatility;
     int stockCount;
-
-    double calculateRiskScore() const {
-        double volatility = static_cast<double>(riskVolatility);
-        double value = totalValue;
-        int count = stockCount;
-    
-        double term1 = pow((volatility * volatility * value) / log(count + 1), 0.6);
-
-        double term2 = pow((volatility * sqrt(value)) / count, 0.3);
-
-        double exponent = -value / 100000.0;
-        double term3 = 0.4 * (volatility / (1 + exp(exponent)));
-        
+    double CalcRisk() const {
+        double vol = static_cast<double>(riskVolatility);
+        double val = totalValue;
+        int cnt = stockCount;
+        double exponent = (-val / 100000.0);
+        double term1 = pow((vol * vol * val/ log(cnt + 1)), 0.6);
+        double term2 = (vol * sqrt(val)) / pow(cnt, 0.3);
+        double term3 = 0.4 * (vol / (1 + exp(exponent)));
         return term1 + term2 + term3;
     }
-
 public:
-    StockPortfolio() {
+    StockPortFolio() {
         ownerName = "";
         totalValue = 0.0;
         riskVolatility = 1;
         stockCount = 0;
     }
+    StockPortFolio(string name, double total, int riskVol, int cnt) {
+        setName(name);
+        setTotalVal(total);
+        setRiskVol(riskVol);
+        setStockCnt(cnt);
+    }
+    void setName(string name) {ownerName = name;}
+    void setTotalVal(double total) {totalValue = total;}
+    void setRiskVol(int riskVol) {riskVolatility = riskVol;}
+    void setStockCnt(int cnt) {stockCount = cnt;}
 
-    StockPortfolio(string name, double value, int volatility, int count) {
-        ownerName = name;
-        totalValue = value;
-        riskVolatility = volatility;
-        stockCount = count;
-    }
-    
- 
-    string getOwnerName() const {
-        return ownerName;
-    }
-    
-    double getTotalValue() const {
-        return totalValue;
-    }
-    
-    int getRiskVolatility() const {
-        return riskVolatility;
-    }
-    
-    int getStockCount() const {
-        return stockCount;
-    }
+    string getName() const {return ownerName;}
+    double getTotalVal() const {return totalValue;}
+    int getRiskVol() const {return riskVolatility;}
+    int getStockCnt() const {return stockCount;}
 
-    void setOwnerName(string name) {
-        ownerName = name;
-    }
-    
-    void setTotalValue(double value) {
-        totalValue = value;
-    }
-    
-    void setRiskVolatility(int volatility) {
-        riskVolatility = volatility;
-    }
-    
-    void setStockCount(int count) {
-        stockCount = count;
-    }
+    StockPortFolio compareSafety(const StockPortFolio& port) const {
+        double thisRisk = CalcRisk();
+        double portRisk = port.CalcRisk();
+        StockPortFolio safer;
 
-    StockPortfolio compareSafety(const StockPortfolio& other) const {
-        double thisRisk = calculateRiskScore();
-        double otherRisk = other.calculateRiskScore();
-        
-        cout << "Comparing portfolios:" << endl;
-        cout << "  " << ownerName << " - Risk Score: " << thisRisk << endl;
-        cout << "  " << other.ownerName << " - Risk Score: " << otherRisk << endl;
-        
-     
-        if (thisRisk < otherRisk) {
-            cout << "  Winner: " << ownerName << " (Lower risk)" << endl << endl;
-            return *this;
-        } else if (otherRisk < thisRisk) {
-            cout << "  Winner: " << other.ownerName << " (Lower risk)" << endl << endl;
-            return other;
-        } else {
-            cout << "  Winner: " << ownerName << " (Equal risk)" << endl << endl;
-            return *this;
+        if (thisRisk < portRisk) {
+            safer.setName(getName());
+            safer.setTotalVal(getTotalVal());
+            safer.setRiskVol(getRiskVol());
+            safer.setStockCnt(getStockCnt());
         }
-
+        else if (portRisk < thisRisk) {
+            safer = port;
+        }
+        else {
+            safer.setName(getName());
+            safer.setTotalVal(getTotalVal());
+            safer.setRiskVol(getRiskVol());
+            safer.setStockCnt(getStockCnt());
+        }
+        return safer;
     }
-
-    void displayDetails() const {
-        cout << "Owner Name:       " << ownerName << endl;
-        cout << "Total Value:      $" << totalValue << endl;
-        cout << "Risk Volatility:  " << riskVolatility << "/10" << endl;
-        cout << "Stock Count:      " << stockCount << endl;
-        cout << "Risk Score:       " << calculateRiskScore() << endl;
+    void DisplayDetails() const {
+        cout << "Owner Name:      " << getName() << endl
+             << "Total Value:     $" << getTotalVal() << endl
+             << "Risk Volatility: " << getRiskVol() << "/10" << endl
+             << "StockCount:      "<< getStockCnt() << endl
+             << "Risk Score:      " << CalcRisk() << endl;
     }
 };
-
 int main() {
-
-    StockPortfolio portfolios[5] ;
-    StockPortfolio safer = portfolios[0];
-    
-    for (int i = 1; i < 5; i++) {
-        cout << "Round " << i << ":" << endl;
-        safer = safer.compareSafety(portfolios[i]);
+    const int SIZE = 5;
+    StockPortFolio port[SIZE];
+    string name;
+    double value;
+    int volatility;
+    int count;
+    cout << "Enter details for 5 portfolios:\n\n";
+    for (int i = 0; i < SIZE; i++) {
+        cout << "Portfolio " << i << ":\n";
+        cout << "Owner name: ";
+        cin >> name;
+        cout << "Total value: ";
+        cin >> value;
+        cout << "Risk volatility (1-10): ";
+        cin >> volatility;
+        cout << "Stock count: ";
+        cin >> count;
+        port[i].setName(name);  
+        port[i].setTotalVal(value);
+        port[i].setRiskVol(volatility);
+        port[i].setStockCnt(count);
+        cout << endl;
     }
-    
-    safer.displayDetails();
-    
+    StockPortFolio safer = port[0];
+    for (int i = 1; i < SIZE; i++) {
+        safer = safer.compareSafety(port[i]);/*Object BEFORE . is CALLING object*/
+    }
+    cout << "\nSafest Portfolio Found:\n";
+    safer.DisplayDetails();
     return 0;
 }
