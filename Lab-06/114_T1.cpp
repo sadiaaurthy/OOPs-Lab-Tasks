@@ -4,166 +4,95 @@ using namespace std;
 
 class DataPack {
 private:
-    float availableDataGB;
-    string providerName;
-    bool exhausted;
+    float dataGB;          
+    string provider;       
+    bool exhausted;        
 
 public:
-    DataPack() : availableDataGB(0.0), providerName("Unknown"), exhausted(true) {
-        cout << "DataPack created with default values" << endl;
-    }
     
-    DataPack(const string& provider, float initialData = 0.0) 
-        : providerName(provider), availableDataGB(initialData), exhausted(initialData <= 0.0) {
-        if (initialData < 0.0) {
-            availableDataGB = 0.0;
-            exhausted = true;
-            cout << "Warning: Negative data amount set to 0.0 GB" << endl;
-        }
-        cout << "DataPack created for " << provider << " with " << availableDataGB << " GB" << endl;
+    DataPack(const string& providerName = "Unknown", float data = 0.0f)
+        : provider(providerName), dataGB(0.0f), exhausted(false)
+    {
+        setDataGB(data);
     }
 
     ~DataPack() {
-        cout << "Connection Terminated for " << providerName << endl;
+        cout << "Connection Terminated" << endl;
     }
 
-    float getAvailableData() const {
-        return availableDataGB;
+    // Getters
+    float getDataGB() const {
+        return dataGB;
     }
-    
-    string getProviderName() const {
-        return providerName;
+
+    string getProvider() const {
+        return provider;
     }
-    
+
     bool isExhausted() const {
         return exhausted;
     }
 
-    void setAvailableData(float data) {
-        if (data < 0.0) {
-            cout << "Error: Cannot set negative data amount. Setting to 0.0 GB" << endl;
-            availableDataGB = 0.0;
+    // Setters
+    void setDataGB(float data) {
+        if (data < 0) {
+            dataGB = 0;
             exhausted = true;
         } else {
-            availableDataGB = data;
-            exhausted = (data <= 0.0);
+            dataGB = data;
+            exhausted = (dataGB == 0);
         }
     }
-    
-    void setProviderName(const string& provider) {
-        if (provider.empty()) {
-            cout << "Error: Provider name cannot be empty" << endl;
-            return;
-        }
-        providerName = provider;
+
+    void setProvider(const string& providerName) {
+        provider = providerName;
     }
-    
+
     void setExhausted(bool status) {
         exhausted = status;
     }
 
+
+    // Add two DataPack objects
     DataPack operator+(const DataPack& other) const {
-        DataPack result(providerName + "+" + other.providerName, 
-                       availableDataGB + other.availableDataGB);
-        return result;
+        DataPack temp(provider, dataGB + other.dataGB); // Use other.getdataGB(), better choice
+        return temp;
     }
 
-    DataPack operator+(float additionalGB) const {
-        if (additionalGB < 0.0) {
-            cout << "Warning: Cannot add negative data. Ignoring operation." << endl;
-            DataPack result(providerName, availableDataGB);
-            return result;
-        }
-        DataPack result(providerName, availableDataGB + additionalGB);
-        return result;
+    // Add extra GB to DataPack(only right side covered)
+    DataPack operator+(float extraGB) const {
+        DataPack temp(provider, dataGB + extraGB);
+        return temp;
     }
 
-    friend DataPack operator+(float additionalGB, const DataPack& pack) {
-        return pack + additionalGB;
-    }
-
-    DataPack operator-(float consumptionGB) const {
-        if (consumptionGB < 0.0) {
-            cout << "Warning: Cannot consume negative data. Ignoring operation." << endl;
-            DataPack result(providerName, availableDataGB);
-            return result;
-        }
-        
-        DataPack result(providerName);
-        
-        if (consumptionGB >= availableDataGB) {
-            result.availableDataGB = 0.0;
-            result.exhausted = true;
-            cout << "Warning: Data exhausted! Consumption (" << consumptionGB 
-                 << " GB) exceeds available data (" << availableDataGB << " GB)" << endl;
+    // Consume data (subtraction)
+    DataPack operator-(float usedGB) const {
+        DataPack temp(*this);
+        if (usedGB >= temp.dataGB) {
+            temp.dataGB = 0;
+            temp.exhausted = true;
         } else {
-            result.availableDataGB = availableDataGB - consumptionGB;
-            result.exhausted = false;
+            temp.dataGB -= usedGB;
         }
-        
-        return result;
+        return temp;
     }
 
     operator int() const {
-        return static_cast<int>(availableDataGB * 1024);
+        return static_cast<int>(dataGB * 1024); // GB → MB
     }
 
     void printData() const {
-     
-        cout << "Provider: " << providerName << endl;
-        cout << "Available Data: " << availableDataGB << " GB" << endl;
-        cout << "Status: " << (exhausted ? "EXHAUSTED" : "ACTIVE") << endl;
-       
+        cout << "Provider: " << provider << endl;
+        cout << "Available Data: " << dataGB << " GB" << endl;
+        cout << "Status: " << (exhausted ? "Exhausted" : "Active") << endl;
+
     }
 
-    void printDataInMB() const {
-        int mb = static_cast<int>(availableDataGB * 1024);
-        cout << "Available Data: " << mb << " MB" << endl;
-    }
+    friend DataPack operator+(float extraGB, const DataPack& dp); 
+    // friend function to cover left side
 };
 
-void demonstratePassByReference(const DataPack& pack) {
-    cout << "\n--- Demonstrating const pass by reference ---" << endl;
-    pack.printData();
-}
-
-int main() {
-    cout << "===== Dormitory Internet Data Manager =====" << endl << endl;
-
-    DataPack d1("Campus WiFi", 5.0);
-    d1.printData();
-
-    cout << "\n--- Adding 2.5 GB ---" << endl;
-    d1 = d1 + 2.5;
-    d1.printData();
-
-    cout << "\n--- Consuming 1.2 GB (streaming lecture) ---" << endl;
-    d1 = d1 - 1.2;
-    d1.printData();
-
-    cout << "\n--- Converting to Megabytes ---" << endl;
-    int mb = d1;
-    cout << "Remaining data in MB: " << mb << " MB" << endl;
-
-    cout << "\n--- Attempting to consume 10 GB (Netflix binge) ---" << endl;
-    d1 = d1 - 10.0;
-    d1.printData();
-
-    if (d1.isExhausted()) {
-        cout << "\n*** WARNING: Data pack exhausted! Time to buy more data! ***" << endl;
-    }
-
-    cout << "\n--- Creating and combining data packs ---" << endl;
-    DataPack d2("Mobile Data", 3.0);
-    DataPack d3 = d1 + d2;
-    d3.printData();
-    
-    demonstratePassByReference(d3);
-    
-    cout << "\n--- Testing error handling ---" << endl;
-    DataPack d4("Test Provider", -2.0); 
-    d4.printData();
-    
-    cout << "\n--- Program ending, destructors will be called ---" << endl;
-    return 0;
+DataPack operator+(float extraGB, const DataPack& dp) {
+    DataPack temp(dp.provider, dp.dataGB + extraGB);
+    return temp;
 }
