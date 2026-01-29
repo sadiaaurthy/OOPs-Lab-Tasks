@@ -116,7 +116,6 @@ public:
 };
 
 int main() {
-    cout << "=== LAB TASK 1: Polymorphism with Person* Array ===" << endl;
     cout << endl;
     Person* people[4];
 
@@ -134,7 +133,7 @@ int main() {
         cout << endl;
     }
     
-    cout << "--- Collecting Role Information ---" << endl;
+    cout << "    Collecting Role Information    " << endl;
     cout << endl;
     
     for (int i = 0; i < 4; i++) {
@@ -142,7 +141,7 @@ int main() {
     }
     
     cout << endl;
-    cout << "--- Special Operations for Student Objects ---" << endl;
+    cout << "    Special Operations for Student Objects    " << endl;
     cout << endl;
     
     for (int i = 0; i < 4; i++) {
@@ -154,7 +153,7 @@ int main() {
         }
     }
     
-    cout << "--- Special Operations for ScholarshipStudent Objects ---" << endl;
+    cout << "    Special Operations for ScholarshipStudent Objects    " << endl;
     cout << endl;
 
     for (int i = 0; i < 4; i++) {
@@ -166,7 +165,7 @@ int main() {
         }
     }
     
-    cout << "--- Additional Test: Changing CGPA and Re-checking Eligibility ---" << endl;
+    cout << "    Additional Test: Changing CGPA and Re-checking Eligibility    " << endl;
     cout << endl;
 
     for (int i = 0; i < 4; i++) {
@@ -185,3 +184,4 @@ int main() {
     
     return 0;
 }
+
